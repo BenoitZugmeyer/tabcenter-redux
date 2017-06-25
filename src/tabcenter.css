@@ -362,7 +362,6 @@ img, .tab *:not(.clickable) {
     width: 20px;
     height: 20px;
     padding: 2px;
-    image-rendering: -moz-crisp-edges;
 }
 
 #tablist:not(.shrinked) .tab-icon {
