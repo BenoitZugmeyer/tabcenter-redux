@@ -23,6 +23,8 @@ SideTabList.prototype = {
   setupListeners() {
     this._spacerView = document.getElementById("spacer");
     this._moreTabsView = document.getElementById("moretabs");
+    this._pinnedTabsView = document.getElementById("pinned-tabs");
+    this._tabsView = document.getElementById("tabs");
 
     // Tab events
     browser.tabs.onActivated.addListener(({tabId}) => this.onBrowserTabActivated(tabId));
@@ -362,11 +364,17 @@ SideTabList.prototype = {
     // Sort the tabs by index so we can insert them in sequence.
     tabs.sort((a, b) => a.index - b.index);
     const fragment = document.createDocumentFragment();
+    const pinnedFragment = document.createDocumentFragment();
     for (let tab of tabs) {
       const sidetab = this._create(tab);
-      fragment.appendChild(sidetab.view);
+      if (tab.pinned) {
+        pinnedFragment.appendChild(sidetab.view);
+      } else {
+        fragment.appendChild(sidetab.view);
+      }
     }
-    this.view.appendChild(fragment);
+    this._pinnedTabsView.appendChild(pinnedFragment);
+    this._tabsView.appendChild(fragment);
     this.maybeShrinkTabs();
     this.updateTabThumbnail(this.active);
     this.scrollToActiveTab();
@@ -505,12 +513,28 @@ SideTabList.prototype = {
     if (!sidetab) {
       return;
     }
-    let element = sidetab.view;
-    let elements = SideTab.getAllTabsViews();
-    if (!elements[pos]) {
-      this.view.insertBefore(element, elements[pos-1].nextSibling);
+
+    let pinnedCount = 0;
+    for (const tab of this.tabs.values()) {
+      if (tab.pinned) {
+        pinnedCount += 1;
+      }
+    }
+
+    let view;
+    if (pos < pinnedCount) {
+      view = this._pinnedTabsView;
     } else {
-      this.view.insertBefore(element, elements[pos]);
+      view = this._tabsView;
+      pos -= pinnedCount;
+    }
+
+    let element = sidetab.view;
+    let elements = view.children;
+    if (!elements[pos]) {
+      view.insertBefore(element, elements[pos-1].nextSibling);
+    } else {
+      view.insertBefore(element, elements[pos]);
     }
   },
   setAudible(tab) {
@@ -541,6 +565,11 @@ SideTabList.prototype = {
     let sidetab = this.getTab(tab);
     if (sidetab) {
       sidetab.updatePinned(tab.pinned);
+      if (tab.pinned && !this._pinnedTabsView.contains(sidetab.view)) {
+        this._pinnedTabsView.append(sidetab.view);
+      } else if (!tab.pinned && !this._tabsView.contains(sidetab.view)) {
+        this._tabsView.prepend(sidetab.view);
+      }
     }
   },
   setContext(tab, context) {

@@ -240,14 +240,10 @@ img, .tab *:not(.clickable) {
 }
 
 #tablist-wrapper {
-    height: 100%;
+    flex: 1;
     display: flex;
+    min-height: 0;
     flex-direction: column;
-    overflow-y: auto;
-}
-
-#tablist {
-    overflow-x: hidden;
 }
 
 .tab {
@@ -264,6 +260,10 @@ img, .tab *:not(.clickable) {
 
 .tab:not(.active):hover {
     background-color: hsl(var(--tab-background-hover));
+}
+
+#pinned-tabs .tab:last-child {
+    border-bottom: 1px solid hsla(0, 0%, 0%, 0.2);
 }
 
 .tab-context:not(.hasContext) {
@@ -303,6 +303,23 @@ img, .tab *:not(.clickable) {
     background-clip: padding-box;
     border: 1px solid hsla(0, 0%, 0%, 0.2);
     box-shadow: 0 1px 0 hsla(0, 0%, 0%, 0.5);
+}
+
+#tablist {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+#pinned-tabs {
+    overflow: hidden;
+}
+
+#tabs {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 #tablist.shrinked .tab-icon-overlay {
@@ -406,35 +423,19 @@ img, .tab *:not(.clickable) {
     --tab-background: var(--tab-background-hover);
 }
 
-.tab:not(.pinned):hover > .tab-title-wrapper::after {
+.tab.closable:hover > .tab-title-wrapper::after {
     transform: translateX(0);
 }
 
-.tab.pinned .tab-title-wrapper::after {
+.tab:not(.closable) .tab-title-wrapper::after {
     transform: translateX(8px);
-}
-
-.tab-pin {
-    display: none;
-}
-
-.tab.pinned .tab-pin {
-    min-width: 16px;
-    height: 16px;
-    margin-right: 12px;
-    display: block;
-    background-image: url("img/glyph-pin-pinned-12.svg");
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: 12px;
-    z-index: 0;
 }
 
 .tab-close {
     display: none;
 }
 
-.tab:not(.pinned) > .tab-close {
+.tab.closable > .tab-close {
     position: absolute;
     display: block;
     width: 24px;
@@ -452,7 +453,7 @@ img, .tab *:not(.clickable) {
     opacity: 0;
 }
 
-.tab:not(.pinned):hover > .tab-close {
+.tab.closable:hover > .tab-close {
     opacity: 1;
 }
 
