@@ -4,6 +4,7 @@
     --tab-background-normal: 0, 0%, 99%;
     --tab-background-active: 0, 0%, 87%;
     --tab-background-hover: 0, 0%, 91%;
+    --tab-hover-transition-duration: 0.2s;
 }
 
 html, body {
@@ -250,8 +251,9 @@ img, .tab *:not(.clickable) {
     display: flex;
     align-items: center;
     height: 56px;
-    border-bottom: 1px solid hsla(0, 0%, 0%, 0.06);
     position: relative;
+    transition: background-color var(--tab-hover-transition-duration);
+    border-bottom: 1px solid hsl(var(--tab-background-hover));
 }
 
 .tab.active {
@@ -384,6 +386,8 @@ img, .tab *:not(.clickable) {
     display: flex;
     min-width: 0;
     flex-direction: column;
+    position: relative;
+    overflow: hidden;
 }
 
 #tablist.shrinked .tab-title-wrapper {
@@ -406,13 +410,13 @@ img, .tab *:not(.clickable) {
 .tab-title-wrapper::after {
     content: '';
     position: absolute;
-    width: 60px;
+    width: 0;
     top: 0;
     bottom: 0;
     right: 0;
     --tab-background: var(--tab-background-normal);
-    background-image: linear-gradient(to right, hsla(var(--tab-background), 0), hsl(var(--tab-background)) 30%);
-    transform: translateX(36px);
+    box-shadow: 0 0 10px 15px hsla(var(--tab-background), 1);
+    transition: box-shadow var(--tab-hover-transition-duration);
 }
 
 .tab.active > .tab-title-wrapper::after {
@@ -423,27 +427,15 @@ img, .tab *:not(.clickable) {
     --tab-background: var(--tab-background-hover);
 }
 
-.tab.closable:hover > .tab-title-wrapper::after {
-    transform: translateX(0);
-}
-
-.tab:not(.closable) .tab-title-wrapper::after {
-    transform: translateX(8px);
-}
-
-.tab-close {
+.tab:not(.closable) > .tab-close {
     display: none;
 }
 
 .tab.closable > .tab-close {
-    position: absolute;
-    display: block;
     width: 24px;
     height: 24px;
-    top: 0;
-    bottom: 0;
-    right: 12px;
-    margin: auto;
+    margin-left: -24px;
+    margin-right: 5px;
     background-color: hsla(0, 0%, 0%, 0.1);
     background-image: url("img/glyph-close-16.svg");
     background-position: center;
@@ -451,10 +443,12 @@ img, .tab *:not(.clickable) {
     background-size: 16px;
     border-radius: 2.5px;
     opacity: 0;
+    transition: opacity var(--tab-hover-transition-duration), margin-left var(--tab-hover-transition-duration);
 }
 
 .tab.closable:hover > .tab-close {
     opacity: 1;
+    margin-left: 0;
 }
 
 .tab-close:hover {
