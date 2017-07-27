@@ -1,9 +1,9 @@
 {
   "name": "__MSG_extensionName__",
   "description": "__MSG_extensionDescription__",
-  "homepage_url": "https://github.com/eoger/tabcenter-redux",
+  "homepage_url": "https://github.com/BenoitZugmeyer/tabcenter-redux",
   "manifest_version": 2,
-  "version": "0.4.1",
+  "version": "0.4.2",
   "default_locale": "en",
   "sidebar_action": {
     "default_title": "__MSG_sidebarTitle__",

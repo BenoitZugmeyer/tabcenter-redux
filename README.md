@@ -1,4 +1,4 @@
-# Tab Center Redux
+# Tab Center Mobx
 
 Your favorite vertical tabbed browsing add-on, now compatible with Firefox 57+.
 [Install the extension](https://addons.mozilla.org/firefox/addon/tab-center-redux/).
