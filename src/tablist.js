@@ -582,15 +582,30 @@ SideTabList.prototype = {
     if (this.compactMode) {
       return;
     }
-    // TODO: sadly we can only capture a thumbnail of the current tab. bug 1246693
-    if (this.active != tabId) {
-      return;
+    const icon = await this.findIcon(tabId);
+    if (icon) {
+      console.log(icon);
+      this.updateThumbnail(tabId, icon.href);
     }
-    let thumbnail = await browser.tabs.captureVisibleTab(this.windowId, {
-      format: "png"
-    });
-    this.updateThumbnail(tabId, thumbnail);
-  }
+  },
+  async findIcon(tabId) {
+    let result;
+    try {
+      ([ result ] = await browser.tabs.executeScript(tabId, {
+        file: "findIcon.js"
+      }));
+    } catch (e) {
+      result = [];
+    }
+
+    console.log(result);
+    return (
+      result.find(({ size }) => size === "any") ||
+      result.find(({ size }) => size > 90) ||
+        result[0] ||
+        { href: (await browser.tabs.get(tabId)).favIconUrl || "img/defaultFavicon.svg" }
+    );
+  },
 };
 
 // Remove case and accents/diacritics.
