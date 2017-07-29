@@ -7,7 +7,7 @@
   "default_locale": "en",
   "sidebar_action": {
     "default_title": "__MSG_sidebarTitle__",
-    "default_panel": "tabcenter.html",
+    "default_panel": "panel/index.html",
     "default_icon": "icons/tabcenter.svg"
   },
   "icons": {

@@ -5,7 +5,7 @@
     "lint": "eslint .",
     "build": "webpack",
     "watch": "webpack --watch",
-    "webext": "web-ext run -s src",
+    "webext": "web-ext run -s dist",
     "dev": "npm-run-all --parallel watch webext"
   },
   "repository": {
@@ -23,5 +23,17 @@
     "npm-run-all": "4.0.2",
     "web-ext": "^1.10.1",
     "webpack": "^3.4.1"
+  },
+  "dependencies": {
+    "@types/react": "^15.6.0",
+    "@types/react-dom": "^15.5.1",
+    "awesome-typescript-loader": "^3.2.2",
+    "copy-webpack-plugin": "^4.0.1",
+    "file-loader": "^1.0.0",
+    "mobx": "^3.2.2",
+    "mobx-react": "^4.2.2",
+    "react": "^16.0.0-beta.2",
+    "react-dom": "^16.0.0-beta.2",
+    "typescript": "^2.4.2"
   }
 }
