@@ -5,7 +5,4 @@ import { observer } from "mobx-react"
 import { tabs } from "./store"
 import TabList from "./TabList"
 
-render(
-  <TabList tabs={tabs} />,
-  document.getElementById('root')
-);
+render(<TabList tabs={tabs} />, document.getElementById("root"))

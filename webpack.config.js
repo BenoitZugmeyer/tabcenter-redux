@@ -1,6 +1,6 @@
 /* global __dirname:true */
-const { CheckerPlugin } = require("awesome-typescript-loader");
-const CopyPlugin = require("copy-webpack-plugin");
+const { CheckerPlugin } = require("awesome-typescript-loader")
+const CopyPlugin = require("copy-webpack-plugin")
 
 module.exports = {
   context: `${__dirname}/src`,
@@ -26,16 +26,16 @@ module.exports = {
     rules: [
       {
         test: /\.tsx?$/,
-        loader: "awesome-typescript-loader"
+        loader: "awesome-typescript-loader",
       },
       {
         test: /\.svg$/,
         loader: "file-loader",
         options: {
-          name: "[path][hash].[ext]"
-        }
-      }
-    ]
+          name: "[path][hash].[ext]",
+        },
+      },
+    ],
   },
 
   plugins: [
@@ -44,6 +44,6 @@ module.exports = {
       { from: "manifest.json" },
       { from: "_locales", to: "_locales" },
       { from: "**/*.html" },
-    ])
-  ]
-};
+    ]),
+  ],
+}

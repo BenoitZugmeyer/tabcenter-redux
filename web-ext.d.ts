@@ -1,4 +1,3 @@
-
 declare namespace WebExt {
   interface Emitter<A> {
     addListener(listener: (arg: A) => void): void
@@ -13,70 +12,70 @@ declare namespace WebExt {
   }
 
   interface Tab {
-    id?: number,
-    windowId: number,
-    favIconUrl?: string,
-    status?: string,
-    active: boolean,
-    pinned: boolean,
-    selected: boolean,
-    title?: boolean,
+    id?: number
+    windowId: number
+    favIconUrl?: string
+    status?: string
+    active: boolean
+    pinned: boolean
+    selected: boolean
+    title?: boolean
   }
 
   interface Window {
-    id?: number,
-    tabs?: Tab[],
+    id?: number
+    tabs?: Tab[]
   }
 
   type PartialTab = Partial<Tab>
 
   interface TabInfo {
-    tabId: number,
-    windowId: number,
+    tabId: number
+    windowId: number
   }
 
   interface TabRemoveInfo {
-    windowId: number,
-    isWindowClosing: boolean,
+    windowId: number
+    isWindowClosing: boolean
   }
 
   interface TabMoveInfo {
-    windowId: number,
-    fromIndex: number,
-    toIndex: number,
+    windowId: number
+    fromIndex: number
+    toIndex: number
   }
 
   interface TabDetachInfo {
-    oldWindowId: number,
-    oldPosition: number,
+    oldWindowId: number
+    oldPosition: number
   }
 
   interface TabAttachInfo {
-    newWindowId: number,
-    newPosition: number,
+    newWindowId: number
+    newPosition: number
   }
 
   interface TabQueryInfo {
-    currentWindow?: boolean,
+    currentWindow?: boolean
   }
 
   interface WindowGetInfo {
-    populate?: boolean,
+    populate?: boolean
     // TODO windowTypes
   }
 
   interface Tabs {
-    get(tabId: number): Promise<Tab>,
-    query(queryInfo: TabQueryInfo): Promise<Tab[]>,
-    update(tabId: number, updateProperties: PartialTab): Promise<Tab>,
+    get(tabId: number): Promise<Tab>
+    query(queryInfo: TabQueryInfo): Promise<Tab[]>
+    update(tabId: number, updateProperties: PartialTab): Promise<Tab>
 
-    onCreated: Emitter<Tab>,
-    onActivated: Emitter<TabInfo>,
-    onUpdated: Emitter3<number, PartialTab, Tab>,
-    onRemoved: Emitter2<number, TabRemoveInfo>,
-    onMoved: Emitter2<number, TabMoveInfo>,
-    onAttached: Emitter2<number, TabAttachInfo>,
-    onDetached: Emitter2<number, TabDetachInfo>,
+    onCreated: Emitter<Tab>
+    onActivated: Emitter<TabInfo>
+    onUpdated: Emitter3<number, PartialTab, Tab>
+    onRemoved: Emitter2<number, TabRemoveInfo>
+    onMoved: Emitter2<number, TabMoveInfo>
+    onAttached: Emitter2<number, TabAttachInfo>
+    onDetached: Emitter2<number, TabDetachInfo>
   }
 
   interface Windows {
@@ -84,8 +83,8 @@ declare namespace WebExt {
   }
 
   interface Browser {
-    tabs: Tabs,
-    windows: Windows,
+    tabs: Tabs
+    windows: Windows
   }
 }
 
