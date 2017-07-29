@@ -19,9 +19,9 @@
   },
   "homepage": "https://github.com/eoger/tabcenter-redux#readme",
   "devDependencies": {
-    "eslint": "3.19.0",
+    "eslint": "^4.3.0",
     "npm-run-all": "4.0.2",
-    "web-ext": "1.9.1",
-    "webpack": "2.6.1"
+    "web-ext": "^1.10.1",
+    "webpack": "^3.4.1"
   }
 }
