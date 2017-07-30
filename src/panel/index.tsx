@@ -3,6 +3,13 @@ import { render } from "react-dom"
 import { observer } from "mobx-react"
 
 import { tabs } from "./store"
+import { create } from "./actions"
 import TabList from "./TabList"
 
-render(<TabList tabs={tabs} />, document.getElementById("root"))
+render(
+  <div>
+    <button type="button" onClick={() => create()}>New</button>
+    <TabList tabs={tabs} />
+  </div>,
+  document.getElementById("root"),
+)

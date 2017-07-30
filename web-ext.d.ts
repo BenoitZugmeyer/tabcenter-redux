@@ -68,6 +68,8 @@ declare namespace WebExt {
     get(tabId: number): Promise<Tab>
     query(queryInfo: TabQueryInfo): Promise<Tab[]>
     update(tabId: number, updateProperties: PartialTab): Promise<Tab>
+    remove(tabIds: number | number[]): Promise<void>
+    create(createProperties: PartialTab): Promise<Tab>
 
     onCreated: Emitter<Tab>
     onActivated: Emitter<TabInfo>

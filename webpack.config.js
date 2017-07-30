@@ -43,6 +43,7 @@ module.exports = {
     new CopyPlugin([
       { from: "manifest.json" },
       { from: "_locales", to: "_locales" },
+      { from: "icons", to: "icons" },
       { from: "**/*.html" },
     ]),
   ],
