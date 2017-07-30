@@ -1,4 +1,4 @@
-import { observable, autorun, action, runInAction, useStrict } from "mobx"
+import { observable, extendObservable, autorun, action, runInAction, useStrict } from "mobx"
 
 useStrict(true)
 
@@ -17,14 +17,10 @@ function refreshTab(newTab: WebExt.PartialTab) {
   }
   console.log("UPDATE", newTab.id, newTab.favIconUrl)
 
-  Object.assign(existingTab, newTab)
+  extendObservable(existingTab, newTab)
 }
 
 let currentWindowId: number = -1
-
-function createTabObservable(tab: WebExt.Tab) {
-  return observable(Object.assign({ favIconUrl: undefined }, tab))
-}
 
 browser.windows
   .getCurrent({ populate: true })
@@ -33,14 +29,14 @@ browser.windows
     runInAction(() => {
       if (!windowTabs) return
       tabs.length = 0
-      tabs.push(...windowTabs.map(createTabObservable))
+      tabs.push(...windowTabs)
     })
   })
 
 browser.tabs.onCreated.addListener(tab => {
   if (tab.windowId !== currentWindowId) return
   runInAction(() => {
-    tabs.push(createTabObservable(tab))
+    tabs.push(tab)
   })
 })
 
