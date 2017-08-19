@@ -18,8 +18,13 @@ declare namespace WebExt {
     status?: string
     active: boolean
     pinned: boolean
+    mutedInfo?: {
+      extensionId?: string
+      muted: boolean
+      reason?: "capture" | "extension" | "user"
+    }
     selected: boolean
-    title?: boolean
+    title?: string
   }
 
   interface Window {
@@ -27,7 +32,13 @@ declare namespace WebExt {
     tabs?: Tab[]
   }
 
-  type PartialTab = Partial<Tab>
+  type PartialTab = {
+    id?: number,
+    favIconUrl?: string
+    muted?: boolean
+    active?: boolean
+    pinned?: boolean
+  }
 
   interface TabInfo {
     tabId: number
@@ -64,6 +75,10 @@ declare namespace WebExt {
     // TODO windowTypes
   }
 
+  interface WindowCreateData {
+    tabId?: number
+  }
+
   interface Tabs {
     get(tabId: number): Promise<Tab>
     query(queryInfo: TabQueryInfo): Promise<Tab[]>
@@ -82,6 +97,7 @@ declare namespace WebExt {
 
   interface Windows {
     getCurrent(getInfo?: WindowGetInfo): Promise<Window>
+      create(createData: WindowCreateData): Promise<Window>
   }
 
   interface Browser {

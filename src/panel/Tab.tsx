@@ -1,8 +1,10 @@
 import * as React from "react"
 import { observer } from "mobx-react"
-import { activate, remove } from "./actions"
+import { autorun } from "mobx"
+import { activate, remove, openMenu } from "./actions"
 import loadingSpinnerImg from "./img/loading-spinner.svg"
 import closeImg from "./img/close.svg"
+import globe from "./img/globe.svg"
 import Style from "./style"
 
 const style = Style.namespace("Tab").addRules({
@@ -17,6 +19,11 @@ const style = Style.namespace("Tab").addRules({
     // transition: "background-color var(--tab-background-delay)"
   },
 
+  pinned: {
+    justifyContent: "center",
+    width: 32
+  },
+
   active: {
     "--tab-background": "#ccc",
   },
@@ -26,7 +33,11 @@ const style = Style.namespace("Tab").addRules({
   },
 
   favicon: {
-    margin: "0 3px",
+    margin: "0 8px",
+  },
+
+  pinnedFavicon: {
+    margin: 0
   },
 
   title: {
@@ -63,7 +74,7 @@ const style = Style.namespace("Tab").addRules({
   },
 
   actionsVisible: {
-    width: 27,
+    width: 24 + 3,
   },
 })
 
@@ -71,9 +82,39 @@ interface Props {
   tab: WebExt.Tab
 }
 
+function isScrollable(element: Element) {
+  const overflow = getComputedStyle(element).overflow
+  return overflow === "auto" || overflow === "scroll"
+}
+
+function scrollIntoViewIfNeeded(element: Element) {
+  let scrollableParent: Element | null = element
+  do {
+    scrollableParent = scrollableParent.parentElement
+  } while (scrollableParent && !isScrollable(scrollableParent))
+
+  if (scrollableParent) {
+    const parentRect = scrollableParent.getBoundingClientRect()
+    const elementRect = element.getBoundingClientRect()
+    if (elementRect.top < parentRect.top) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      })
+    } else if (elementRect.bottom > parentRect.bottom) {
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      })
+    }
+  }
+}
+
 @observer
 class Tab extends React.Component {
   props: Props
+  _unsubscribe?: () => void
+  base?: HTMLDivElement | null
 
   state = {
     over: false,
@@ -85,26 +126,70 @@ class Tab extends React.Component {
 
     return (
       <div
-        className={style("root", over && "over", tab.active && "active")}
-        onMouseDown={() => activate(tab)}
+        ref={el => {
+          this.base = el
+        }}
+        className={style("root", over && "over", tab.active && "active", tab.pinned && "pinned")}
+        onMouseDown={this.onMouseDown}
+        onContextMenu={this.onContextMenu}
         onMouseEnter={() => this.setState({ over: true })}
         onMouseLeave={() => this.setState({ over: false })}
+        title={tab.title}
+        contextMenu="foo"
       >
         <img
-          className={style("favicon")}
-          src={tab.status === "loading" ? loadingSpinnerImg : tab.favIconUrl}
+          className={style("favicon", tab.pinned && "pinnedFavicon")}
+          src={tab.status === "loading" ? loadingSpinnerImg : tab.favIconUrl || globe}
           width="16"
           height="16"
         />
-        <div className={style("title")}>
-          {tab.title || ""}
-        </div>
-        <div className={style("titleShadow")} />
-        <div className={style("actions", over && "actionsVisible")}>
-          <div className={style("closeButton")} onClick={() => remove(tab)} />
-        </div>
+        {!tab.pinned &&
+          <div className={style("title")}>
+            {tab.title || ""}
+          </div>}
+        {!tab.pinned && <div className={style("titleShadow")} />}
+        {!tab.pinned &&
+          <div className={style("actions", over && "actionsVisible")}>
+            <div
+              className={style("closeButton")}
+              onClick={() => remove(tab)}
+              title="Close"
+            />
+          </div>}
       </div>
     )
+  }
+
+  componentDidMount() {
+    this._watchActive()
+  }
+
+  componentDidUpdate(previousProps: Props) {
+    if (previousProps.tab !== this.props.tab) this._watchActive()
+  }
+
+  _watchActive() {
+    if (this._unsubscribe) this._unsubscribe()
+    this._unsubscribe = autorun(() => {
+      if (this.base && this.props.tab.active) {
+        scrollIntoViewIfNeeded(this.base)
+      }
+    })
+  }
+
+  onMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault()
+    if (event.button === 0) {
+      activate(this.props.tab)
+    } else if (event.button === 1) {
+      // middle click
+      remove(this.props.tab)
+    }
+  }
+
+  onContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
+    openMenu(this.props.tab, { x: event.pageX, y: event.pageY })
+    event.preventDefault()
   }
 }
 

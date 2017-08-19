@@ -2,7 +2,9 @@ import { observable, extendObservable, autorun, action, runInAction, useStrict }
 
 useStrict(true)
 
+export type Coordinates = { x: number, y: number }
 export const tabs = observable([] as WebExt.Tab[])
+export const menu = observable({ tab: null as WebExt.Tab|null, position: null as Coordinates|null })
 
 function refreshTab(newTab: WebExt.PartialTab) {
   if (!newTab.id) {
