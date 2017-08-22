@@ -21,7 +21,7 @@ const style = Style.namespace("Tab").addRules({
 
   pinned: {
     justifyContent: "center",
-    width: 32
+    width: 32,
   },
 
   active: {
@@ -37,7 +37,7 @@ const style = Style.namespace("Tab").addRules({
   },
 
   pinnedFavicon: {
-    margin: 0
+    margin: 0,
   },
 
   title: {
@@ -129,7 +129,12 @@ class Tab extends React.Component {
         ref={el => {
           this.base = el
         }}
-        className={style("root", over && "over", tab.active && "active", tab.pinned && "pinned")}
+        className={style(
+          "root",
+          over && "over",
+          tab.active && "active",
+          tab.pinned && "pinned",
+        )}
         onMouseDown={this.onMouseDown}
         onContextMenu={this.onContextMenu}
         onMouseEnter={() => this.setState({ over: true })}
@@ -139,7 +144,11 @@ class Tab extends React.Component {
       >
         <img
           className={style("favicon", tab.pinned && "pinnedFavicon")}
-          src={tab.status === "loading" ? loadingSpinnerImg : tab.favIconUrl || globe}
+          src={
+            tab.status === "loading"
+              ? loadingSpinnerImg
+              : tab.favIconUrl || globe
+          }
           width="16"
           height="16"
         />

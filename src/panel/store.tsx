@@ -1,10 +1,20 @@
-import { observable, extendObservable, autorun, action, runInAction, useStrict } from "mobx"
+import {
+  observable,
+  extendObservable,
+  autorun,
+  action,
+  runInAction,
+  useStrict,
+} from "mobx"
 
 useStrict(true)
 
-export type Coordinates = { x: number, y: number }
+export type Coordinates = { x: number; y: number }
 export const tabs = observable([] as WebExt.Tab[])
-export const menu = observable({ tab: null as WebExt.Tab|null, position: null as Coordinates|null })
+export const menu = observable({
+  tab: null as WebExt.Tab | null,
+  position: null as Coordinates | null,
+})
 
 function refreshTab(newTab: WebExt.PartialTab) {
   if (!newTab.id) {

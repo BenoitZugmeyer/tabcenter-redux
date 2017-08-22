@@ -5,8 +5,8 @@ import Style from "./style"
 import Tab from "./Tab"
 
 interface Props {
-  tabs: WebExt.Tab[],
-  pinned?: boolean,
+  tabs: WebExt.Tab[]
+  pinned?: boolean
 }
 
 const style = Style.namespace("TabList").addRules({
@@ -18,9 +18,8 @@ const style = Style.namespace("TabList").addRules({
 
   pinned: {
     display: "flex",
-  }
+  },
 })
-
 
 @observer
 class TabList extends React.Component {

@@ -33,7 +33,7 @@ declare namespace WebExt {
   }
 
   type PartialTab = {
-    id?: number,
+    id?: number
     favIconUrl?: string
     muted?: boolean
     active?: boolean
@@ -97,7 +97,7 @@ declare namespace WebExt {
 
   interface Windows {
     getCurrent(getInfo?: WindowGetInfo): Promise<Window>
-      create(createData: WindowCreateData): Promise<Window>
+    create(createData: WindowCreateData): Promise<Window>
   }
 
   interface Browser {
