@@ -48,7 +48,7 @@ browser.windows
 browser.tabs.onCreated.addListener(tab => {
   if (tab.windowId !== currentWindowId) return
   runInAction(() => {
-    tabs.push(tab)
+    tabs.splice(tab.index, 0, tab)
   })
 })
 

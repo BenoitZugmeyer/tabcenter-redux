@@ -16,6 +16,7 @@ declare namespace WebExt {
     windowId: number
     favIconUrl?: string
     status?: string
+    index: number
     active: boolean
     pinned: boolean
     mutedInfo?: {
