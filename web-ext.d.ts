@@ -15,7 +15,7 @@ declare namespace WebExt {
     id?: number
     windowId: number
     favIconUrl?: string
-    status?: string
+    status?: "complete" | "loading"
     index: number
     active: boolean
     pinned: boolean
@@ -39,6 +39,7 @@ declare namespace WebExt {
     muted?: boolean
     active?: boolean
     pinned?: boolean
+    title?: string
   }
 
   interface TabInfo {

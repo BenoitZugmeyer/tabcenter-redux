@@ -2,6 +2,7 @@ import * as React from "react"
 import { observer } from "mobx-react"
 import { autorun } from "mobx"
 import { activate, remove, openMenu } from "./actions"
+import { Tab as TabType } from "./store"
 import loadingSpinnerImg from "./img/loading-spinner.svg"
 import closeImg from "./img/close.svg"
 import globe from "./img/globe.svg"
@@ -9,6 +10,7 @@ import Style from "./style"
 
 const style = Style.namespace("Tab").addRules({
   root: {
+    position: "relative",
     display: "flex",
     height: 32,
     "--tab-background": "#fff",
@@ -30,6 +32,18 @@ const style = Style.namespace("Tab").addRules({
 
   over: {
     "--tab-background": "#e5e5e5",
+  },
+
+  titleChanged: {
+    position: "absolute",
+    top: 16,
+    left: 0,
+    boxShadow: "0 0 8px 6px #ffaa00",
+  },
+
+  titleChangedPinned: {
+    top: 0,
+    left: 16,
   },
 
   favicon: {
@@ -79,7 +93,7 @@ const style = Style.namespace("Tab").addRules({
 })
 
 interface Props {
-  tab: WebExt.Tab
+  tab: TabType
 }
 
 function isScrollable(element: Element) {
@@ -152,6 +166,13 @@ class Tab extends React.Component {
           width="16"
           height="16"
         />
+        {tab.titleChanged &&
+          <div
+            className={style(
+              "titleChanged",
+              tab.pinned && "titleChangedPinned",
+            )}
+          />}
         {!tab.pinned &&
           <div className={style("title")}>
             {tab.title || ""}

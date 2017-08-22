@@ -9,14 +9,18 @@ import {
 
 useStrict(true)
 
+export interface Tab extends WebExt.Tab {
+  titleChanged: boolean
+}
+
 export type Coordinates = { x: number; y: number }
-export const tabs = observable([] as WebExt.Tab[])
+export const tabs = observable([] as Tab[])
 export const menu = observable({
-  tab: null as WebExt.Tab | null,
+  tab: null as Tab | null,
   position: null as Coordinates | null,
 })
 
-function refreshTab(newTab: WebExt.PartialTab) {
+function refreshTab(newTab: WebExt.Tab) {
   if (!newTab.id) {
     console.warn(currentWindowId, "Tab doesn't have an id")
     return
@@ -27,12 +31,25 @@ function refreshTab(newTab: WebExt.PartialTab) {
     console.warn(currentWindowId, `Tab not found in store`, newTab)
     return
   }
-  console.log("UPDATE", newTab.id, newTab.favIconUrl)
+  console.log("UPDATE", newTab.id)
+
+  if (newTab.active) {
+    existingTab.titleChanged = false
+  } else if (
+    existingTab.title !== newTab.title &&
+    existingTab.status === "complete"
+  ) {
+    existingTab.titleChanged = true
+  }
 
   extendObservable(existingTab, newTab)
 }
 
 let currentWindowId: number = -1
+
+function makeTab(tab: WebExt.Tab) {
+  return { ...tab, titleChanged: false }
+}
 
 browser.windows
   .getCurrent({ populate: true })
@@ -41,14 +58,14 @@ browser.windows
     runInAction(() => {
       if (!windowTabs) return
       tabs.length = 0
-      tabs.push(...windowTabs)
+      tabs.push(...windowTabs.map(makeTab))
     })
   })
 
 browser.tabs.onCreated.addListener(tab => {
   if (tab.windowId !== currentWindowId) return
   runInAction(() => {
-    tabs.splice(tab.index, 0, tab)
+    tabs.splice(tab.index, 0, makeTab(tab))
   })
 })
 
@@ -99,7 +116,7 @@ browser.tabs.onAttached.addListener(
     if (newWindowId !== currentWindowId) return
     const newTab = await browser.tabs.get(tabId)
     runInAction(() => {
-      tabs.splice(newPosition, 0, newTab)
+      tabs.splice(newPosition, 0, makeTab(newTab))
     })
   },
 )

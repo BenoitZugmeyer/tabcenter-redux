@@ -2,10 +2,11 @@ import * as React from "react"
 import { observer } from "mobx-react"
 
 import Style from "./style"
+import { Tab as TabType } from "./store"
 import Tab from "./Tab"
 
 interface Props {
-  tabs: WebExt.Tab[]
+  tabs: TabType[]
   pinned?: boolean
 }
 

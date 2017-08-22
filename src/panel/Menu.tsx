@@ -10,7 +10,9 @@ const style = Style.namespace("Menu").addRules({
     backgroundColor: "#eff0f1",
     border: "1px solid #c0c2c4",
     borderRadius: "2px",
+    zIndex: 1,
   },
+
   menuItem: {
     padding: "4px 8px",
     whiteSpace: "nowrap",
