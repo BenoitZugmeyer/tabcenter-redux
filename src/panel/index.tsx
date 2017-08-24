@@ -22,7 +22,9 @@ const style = Style.namespace("Panel").addRules({
     flexShrink: 1,
     minHeight: 0,
     overflow: "auto",
-    borderTop: "1px solid #eceeef",
+    ":not(:first-child)": {
+      borderTop: "1px solid #eceeef",
+    }
   },
   hiddenTabsCount: {
     minHeight: 32,
@@ -38,6 +40,32 @@ const style = Style.namespace("Panel").addRules({
     height: 44,
     padding: 6,
   },
+
+  newButton: {
+    inherit: "input",
+    backgroundColor: "#fcfcfc",
+    ":active": {
+      backgroundColor: "#cecfd0",
+    },
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "center center",
+    backgroundImage: `url('data:image/svg+xml,${encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4c4c4c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    `)}')`,
+    borderRadius: "100px",
+    width: "32px",
+    height: "32px",
+    padding: 0,
+    textAlign: "center",
+    marginRight: 6,
+    outline: "none",
+    "::-moz-focus-inner": {
+      border: "none",
+    }
+  }
 })
 
 function preventNativeMenu(e: React.MouseEvent<HTMLDivElement>) {
@@ -57,7 +85,6 @@ class Panel extends React.Component {
 
     return (
       <div className={style("root")} onContextMenu={preventNativeMenu}>
-        <Menu />
         <TabList tabs={tabs} pinned />
         <div className={style("scroll")}>
           <TabList tabs={tabs} />
@@ -67,10 +94,9 @@ class Panel extends React.Component {
             {hiddenTabsCount} hidden {hiddenTabsCount === 1 ? "tab" : "tabs"}
           </div>}
         <div className={style("freeSpace")} onDoubleClick={() => create()} />
+        <Menu />
         <div className={style("actions")}>
-          <button type="button" onClick={() => create()}>
-            New
-          </button>
+          <button className={style("newButton")} type="button" onClick={() => create()} />
           <Search />
         </div>
       </div>

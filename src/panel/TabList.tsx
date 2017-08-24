@@ -28,12 +28,11 @@ class TabList extends React.Component {
 
   render() {
     const { pinned } = this.props
+    const tabs = this.props.tabs.filter(tab => tab.pinned === Boolean(pinned))
+    if (!tabs.length) return null
     return (
       <div className={style("root", pinned && "pinned")}>
-        {this.props.tabs.map(
-          tab =>
-            tab.pinned === Boolean(pinned) && <Tab key={tab.id} tab={tab} />,
-        )}
+        {tabs.map(tab => <Tab key={tab.id} tab={tab} />)}
       </div>
     )
   }
