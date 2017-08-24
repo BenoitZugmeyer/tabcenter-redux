@@ -1,7 +1,7 @@
 import {
   observable,
   extendObservable,
-  autorun,
+  reaction,
   action,
   runInAction,
   useStrict,
@@ -11,6 +11,7 @@ useStrict(true)
 
 export interface Tab extends WebExt.Tab {
   titleChanged: boolean
+  hidden: boolean
 }
 
 export type Coordinates = { x: number; y: number }
@@ -19,6 +20,40 @@ export const menu = observable({
   tab: null as Tab | null,
   position: null as Coordinates | null,
 })
+export const search = observable({
+  query: "",
+})
+
+/** Search */
+
+function escapeRegExp(str: string) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")
+}
+
+function compileFilter(str: string) {
+  return new RegExp(escapeRegExp(str).replace(/\s+/g, ".*"), "i")
+}
+
+function setsEquals<T>(a: Set<T>, b: Set<T>) {
+  if (a.size !== b.size) return false
+  for (const item of a) if (!b.has(item)) return false
+  return true
+}
+
+reaction(
+  () => {
+    const filter = compileFilter(search.query)
+    return new Set(tabs.filter(tab => tab.title && !filter.test(tab.title)))
+  },
+  tabsToHide => {
+    for (const tab of tabs) tab.hidden = tabsToHide.has(tab)
+  },
+  {
+    equals: setsEquals,
+  },
+)
+
+/** Tabs sync */
 
 function refreshTab(newTab: WebExt.Tab) {
   if (!newTab.id) {
@@ -48,7 +83,7 @@ function refreshTab(newTab: WebExt.Tab) {
 let currentWindowId: number = -1
 
 function makeTab(tab: WebExt.Tab) {
-  return { ...tab, titleChanged: false }
+  return { ...tab, titleChanged: false, hidden: false }
 }
 
 browser.windows

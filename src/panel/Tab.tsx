@@ -137,6 +137,7 @@ class Tab extends React.Component {
   render() {
     const { tab } = this.props
     const { over } = this.state
+    if (tab.hidden) return null
 
     return (
       <div

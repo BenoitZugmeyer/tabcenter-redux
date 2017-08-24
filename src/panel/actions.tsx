@@ -1,5 +1,5 @@
 import { extendObservable, runInAction } from "mobx"
-import { menu, Coordinates } from "./store"
+import { menu, Coordinates, search as searchStore } from "./store"
 
 export function activate(tab: WebExt.Tab): void {
   if (!tab.id) return
@@ -39,5 +39,11 @@ export function openMenu(tab: WebExt.Tab, position: Coordinates): void {
 export function closeMenu(): void {
   runInAction(() => {
     menu.tab = null
+  })
+}
+
+export function search(query: string): void {
+  runInAction(() => {
+    searchStore.query = query
   })
 }
