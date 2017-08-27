@@ -2,9 +2,17 @@ import * as React from "react"
 import { render } from "react-dom"
 import { observer } from "mobx-react"
 
-import { tabs } from "./store"
-import { create, search } from "./actions"
+import { tabs, currentWindowId, Tab as TabType } from "./store"
+import {
+  create,
+  search,
+  startDrag,
+  stopDrag,
+  insertTabAt,
+  setDragTarget,
+} from "./actions"
 import Style from "./style"
+import { fromElement } from "./Tab"
 import TabList from "./TabList"
 import Menu from "./Menu"
 import Search from "./Search"
@@ -24,7 +32,7 @@ const style = Style.namespace("Panel").addRules({
     overflow: "auto",
     ":not(:first-child)": {
       borderTop: "1px solid #eceeef",
-    }
+    },
   },
   hiddenTabsCount: {
     minHeight: 32,
@@ -64,15 +72,33 @@ const style = Style.namespace("Panel").addRules({
     outline: "none",
     "::-moz-focus-inner": {
       border: "none",
-    }
-  }
+    },
+  },
 })
 
-function preventNativeMenu(e: React.MouseEvent<HTMLDivElement>) {
-  const target = e.target as HTMLInputElement
+function preventNativeMenu(event: React.MouseEvent<HTMLDivElement>) {
+  const target = event.target as HTMLInputElement
   if (target.tagName !== "INPUT" || target.type !== "text") {
-    e.preventDefault()
+    event.preventDefault()
   }
+}
+
+const blankImage = new Image()
+blankImage.src =
+  "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+
+type DragInfos = {
+  windowId: number,
+  tabId: number,
+}
+
+function setDragInfos(event: React.DragEvent<Element>, infos: DragInfos) {
+  event.dataTransfer.setData("text/x-yatab-tab", JSON.stringify(infos))
+}
+
+function getDragInfos(event: React.DragEvent<Element>): DragInfos | undefined {
+  const rawInfos = event.dataTransfer.getData("text/x-yatab-tab")
+  return rawInfos && JSON.parse(rawInfos)
 }
 
 @observer
@@ -84,7 +110,14 @@ class Panel extends React.Component {
     )
 
     return (
-      <div className={style("root")} onContextMenu={preventNativeMenu}>
+      <div
+        className={style("root")}
+        onContextMenu={preventNativeMenu}
+        onDragEnd={this._onDragEnd}
+        onDragOver={this._onDragOver}
+        onDragStart={this._onDragStart}
+        onDrop={this._onDrop}
+      >
         <TabList tabs={tabs} pinned />
         <div className={style("scroll")}>
           <TabList tabs={tabs} />
@@ -96,11 +129,62 @@ class Panel extends React.Component {
         <div className={style("freeSpace")} onDoubleClick={() => create()} />
         <Menu />
         <div className={style("actions")}>
-          <button className={style("newButton")} type="button" onClick={() => create()} />
+          <button
+            className={style("newButton")}
+            type="button"
+            onClick={() => create()}
+          />
           <Search />
         </div>
       </div>
     )
+  }
+
+  _onDragStart = (event: React.DragEvent<Element>) => {
+    const tab = fromElement(event.target as Node)
+    if (tab) {
+      startDrag(tab)
+      setDragInfos(event, {
+        tabId: tab.id,
+        windowId: tab.windowId,
+      })
+      event.dataTransfer.setData("Text", tab.url || "about:blank")
+      event.dataTransfer.setDragImage(blankImage, 0, 0)
+    }
+  }
+
+  _onDrop = async (event: React.DragEvent<Element>) => {
+    const targetTab = tabs.find(t => t.dragTarget)
+    if (targetTab) {
+      const infos = getDragInfos(event)
+      if (infos) insertTabAt(infos.tabId, targetTab)
+    }
+  }
+
+  _onDragEnd = (event: React.DragEvent<Element>) => {
+    stopDrag()
+  }
+
+  _onDragOver = (event: React.DragEvent<Element>) => {
+    event.preventDefault()
+    const targetTab = fromElement(event.target as Node)
+    if (!targetTab || targetTab.dragging) return
+    const targetIndex = tabs.indexOf(targetTab)
+    const currentTargetIndex = tabs.findIndex(tab => tab.dragTarget)
+    const draggingIndex = tabs.findIndex(tab => tab.dragging)
+    const draggingTab = tabs[draggingIndex]
+
+    if (!draggingTab) {
+      // TODO
+    } else if (draggingTab.pinned !== targetTab.pinned) {
+      return;
+    } else if (currentTargetIndex !== targetIndex) {
+      setDragTarget(targetTab)
+    } else if (draggingIndex < targetIndex) {
+      setDragTarget(tabs[targetIndex - 1])
+    } else if (draggingIndex > targetIndex) {
+      setDragTarget(tabs[targetIndex + 1])
+    }
   }
 }
 

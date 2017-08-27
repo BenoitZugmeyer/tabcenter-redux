@@ -1,5 +1,6 @@
 import { extendObservable, runInAction } from "mobx"
-import { menu, Coordinates, search as searchStore } from "./store"
+import { insertAt } from "./util"
+import { tabs, menu, Coordinates, search as searchStore, Tab, currentWindowId } from "./store"
 
 export function activate(tab: WebExt.Tab): void {
   if (!tab.id) return
@@ -45,5 +46,43 @@ export function closeMenu(): void {
 export function search(query: string): void {
   runInAction(() => {
     searchStore.query = query
+  })
+}
+
+export function startDrag(tab: Tab): void {
+  runInAction(() => {
+    tab.dragging = true
+  })
+}
+
+export function stopDrag(): void {
+  runInAction(() => {
+    for (const tab of tabs) {
+      tab.dragging = false
+      tab.dragTarget = false
+    }
+  })
+}
+
+export function setDragTarget(target: Tab | null): void {
+  runInAction(() => {
+    for (const tab of tabs) {
+      tab.dragTarget = target === tab
+    }
+  })
+}
+
+export function insertTabAt(tabId: number, targetTab: Tab) {
+  runInAction(() => {
+    const index = tabs.indexOf(targetTab)
+    if (tabId !== targetTab.id && index >= 0) {
+
+      // Optimist store update, because the browser.tabs.move can take a few ms
+      const knownTabIndex = tabs.findIndex((tab) => tab.id === tabId)
+      if (knownTabIndex >= 0) insertAt(tabs, knownTabIndex, index)
+
+      browser.tabs.move(tabId, { index, windowId: currentWindowId });
+    }
+    stopDrag()
   })
 }

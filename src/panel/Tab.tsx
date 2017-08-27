@@ -21,6 +21,10 @@ const style = Style.namespace("Tab").addRules({
     // transition: "background-color var(--tab-background-delay)"
   },
 
+  dragging: {
+    opacity: 0.4,
+  },
+
   pinned: {
     justifyContent: "center",
     width: 32,
@@ -124,6 +128,16 @@ function scrollIntoViewIfNeeded(element: Element) {
   }
 }
 
+const tabElements = new WeakMap()
+
+export function fromElement(element: Node | null) {
+  while (element) {
+    const tab = tabElements.get(element)
+    if (tab) return tab
+    element = element.parentNode
+  }
+}
+
 @observer
 class Tab extends React.Component {
   props: Props
@@ -149,13 +163,14 @@ class Tab extends React.Component {
           over && "over",
           tab.active && "active",
           tab.pinned && "pinned",
+          tab.dragging && "dragging",
         )}
         onMouseDown={this.onMouseDown}
         onContextMenu={this.onContextMenu}
         onMouseEnter={() => this.setState({ over: true })}
         onMouseLeave={() => this.setState({ over: false })}
         title={tab.title}
-        contextMenu="foo"
+        draggable
       >
         <img
           className={style("favicon", tab.pinned && "pinnedFavicon")}
@@ -192,11 +207,17 @@ class Tab extends React.Component {
   }
 
   componentDidMount() {
+    this._register()
     this._watchActive()
   }
 
   componentDidUpdate(previousProps: Props) {
+    this._register()
     if (previousProps.tab !== this.props.tab) this._watchActive()
+  }
+
+  _register() {
+    if (this.base) tabElements.set(this.base, this.props.tab)
   }
 
   _watchActive() {
@@ -209,7 +230,6 @@ class Tab extends React.Component {
   }
 
   onMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault()
     if (event.button === 0) {
       activate(this.props.tab)
     } else if (event.button === 1) {

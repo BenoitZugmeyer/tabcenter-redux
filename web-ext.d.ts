@@ -16,6 +16,7 @@ declare namespace WebExt {
     windowId: number
     favIconUrl?: string
     status?: "complete" | "loading"
+    url?: string
     index: number
     active: boolean
     pinned: boolean
@@ -81,12 +82,19 @@ declare namespace WebExt {
     tabId?: number
   }
 
+  interface MoveProperties {
+    index: number
+    windowId?: number
+  }
+
   interface Tabs {
     get(tabId: number): Promise<Tab>
     query(queryInfo: TabQueryInfo): Promise<Tab[]>
     update(tabId: number, updateProperties: PartialTab): Promise<Tab>
     remove(tabIds: number | number[]): Promise<void>
     create(createProperties: PartialTab): Promise<Tab>
+    // move(tabIds: number[], moveProperties: MoveProperties): Promise<Tab[]>
+    move(tabIds: number, moveProperties: MoveProperties): Promise<Tab>
 
     onCreated: Emitter<Tab>
     onActivated: Emitter<TabInfo>

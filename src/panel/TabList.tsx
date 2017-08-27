@@ -2,6 +2,7 @@ import * as React from "react"
 import { observer } from "mobx-react"
 
 import Style from "./style"
+import { insertAt } from "./util"
 import { Tab as TabType } from "./store"
 import Tab from "./Tab"
 
@@ -30,6 +31,13 @@ class TabList extends React.Component {
     const { pinned } = this.props
     const tabs = this.props.tabs.filter(tab => tab.pinned === Boolean(pinned))
     if (!tabs.length) return null
+
+    insertAt(
+      tabs,
+      tabs.findIndex(tab => tab.dragging),
+      tabs.findIndex(tab => tab.dragTarget),
+    )
+
     return (
       <div className={style("root", pinned && "pinned")}>
         {tabs.map(tab => <Tab key={tab.id} tab={tab} />)}

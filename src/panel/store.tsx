@@ -7,11 +7,15 @@ import {
   useStrict,
 } from "mobx"
 
+import { insertAt } from "./util"
+
 useStrict(true)
 
 export interface Tab extends WebExt.Tab {
   titleChanged: boolean
   hidden: boolean
+  dragging: boolean
+  dragTarget: boolean
 }
 
 export type Coordinates = { x: number; y: number }
@@ -23,6 +27,7 @@ export const menu = observable({
 export const search = observable({
   query: "",
 })
+
 
 /** Search */
 
@@ -66,7 +71,6 @@ function refreshTab(newTab: WebExt.Tab) {
     console.warn(currentWindowId, `Tab not found in store`, newTab)
     return
   }
-  console.log("UPDATE", newTab.id)
 
   if (newTab.active) {
     existingTab.titleChanged = false
@@ -80,10 +84,10 @@ function refreshTab(newTab: WebExt.Tab) {
   extendObservable(existingTab, newTab)
 }
 
-let currentWindowId: number = -1
+export let currentWindowId: number = -1
 
 function makeTab(tab: WebExt.Tab) {
-  return { ...tab, titleChanged: false, hidden: false }
+  return { ...tab, titleChanged: false, hidden: false, dragging: false, dragTarget: false }
 }
 
 browser.windows
@@ -130,11 +134,10 @@ browser.tabs.onRemoved.addListener((tabId, { windowId }) => {
   })
 })
 
-browser.tabs.onMoved.addListener((tabId, { windowId, fromIndex, toIndex }) => {
+browser.tabs.onMoved.addListener((tabId, { windowId, toIndex }) => {
   if (windowId !== currentWindowId) return
   runInAction(() => {
-    const [tab] = tabs.splice(fromIndex, 1)
-    tabs.splice(toIndex, 0, tab)
+    insertAt(tabs, tabs.findIndex(({ id }) => tabId === id), toIndex)
   })
 })
 
