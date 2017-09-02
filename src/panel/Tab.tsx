@@ -1,6 +1,6 @@
 import * as React from "react"
 import { observer } from "mobx-react"
-import { autorun } from "mobx"
+import { autorunAsync } from "mobx"
 import { activate, remove, openMenu } from "./actions"
 import { Tab as TabType } from "./store"
 import loadingSpinnerImg from "./img/loading-spinner.svg"
@@ -207,26 +207,17 @@ class Tab extends React.Component {
   }
 
   componentDidMount() {
-    this._register()
-    this._watchActive()
-  }
-
-  componentDidUpdate(previousProps: Props) {
-    this._register()
-    if (previousProps.tab !== this.props.tab) this._watchActive()
-  }
-
-  _register() {
     if (this.base) tabElements.set(this.base, this.props.tab)
-  }
-
-  _watchActive() {
-    if (this._unsubscribe) this._unsubscribe()
-    this._unsubscribe = autorun(() => {
+    this._unsubscribe = autorunAsync(() => {
       if (this.base && this.props.tab.active) {
         scrollIntoViewIfNeeded(this.base)
       }
-    })
+    }, 100)
+  }
+
+  componentWillUnmount() {
+    if (this.base) tabElements.delete(this.base)
+    if (this._unsubscribe) this._unsubscribe()
   }
 
   onMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
