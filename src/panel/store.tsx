@@ -2,7 +2,6 @@ import {
   observable,
   extendObservable,
   reaction,
-  action,
   runInAction,
   useStrict,
 } from "mobx"
@@ -119,7 +118,7 @@ browser.tabs.onActivated.addListener(async ({ windowId, tabId }) => {
   })
 })
 
-browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+browser.tabs.onUpdated.addListener((_tabId, _changeInfo, tab) => {
   if (tab.windowId !== currentWindowId) return
   runInAction(() => {
     refreshTab(tab)

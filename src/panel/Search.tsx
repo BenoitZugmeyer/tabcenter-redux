@@ -3,7 +3,7 @@ import { observer } from "mobx-react"
 
 import { search } from "./actions"
 import Style from "./style"
-import { Tab as TabType, search as searchStore } from "./store"
+import { search as searchStore } from "./store"
 
 interface Props {}
 

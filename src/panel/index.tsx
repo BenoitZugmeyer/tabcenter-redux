@@ -2,7 +2,7 @@ import * as React from "react"
 import { render } from "react-dom"
 import { observer } from "mobx-react"
 
-import { tabs, currentWindowId, Tab as TabType } from "./store"
+import { tabs } from "./store"
 import {
   create,
   search,
@@ -161,7 +161,7 @@ class Panel extends React.Component {
     }
   }
 
-  _onDragEnd = (event: React.DragEvent<Element>) => {
+  _onDragEnd = () => {
     stopDrag()
   }
 

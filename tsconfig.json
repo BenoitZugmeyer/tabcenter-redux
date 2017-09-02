@@ -6,6 +6,8 @@
     "target": "ES5",
     "module": "es5",
     "experimentalDecorators": true,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
   }
 }

@@ -118,7 +118,7 @@ class Menu extends React.Component {
   }
 
   _toggleEvents(attach: boolean) {
-    if (menu.tab) {
+    if (attach) {
       addEventListener("mousedown", this.onGlobalMouseDown, true)
       addEventListener("blur", this.onGlobalBlur, true)
     } else {
