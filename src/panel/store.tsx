@@ -83,6 +83,10 @@ function refreshTab(newTab: WebExt.Tab) {
   extendObservable(existingTab, newTab)
 }
 
+function updateTabIndexes() {
+  tabs.forEach((tab, index) => tab.index = index)
+}
+
 export let currentWindowId: number = -1
 
 function makeTab(tab: WebExt.Tab) {
@@ -130,6 +134,7 @@ browser.tabs.onRemoved.addListener((tabId, { windowId }) => {
   runInAction(() => {
     const index = tabs.findIndex(({ id }) => tabId === id)
     tabs.splice(index, 1)
+    updateTabIndexes()
   })
 })
 
@@ -137,6 +142,7 @@ browser.tabs.onMoved.addListener((tabId, { windowId, toIndex }) => {
   if (windowId !== currentWindowId) return
   runInAction(() => {
     insertAt(tabs, tabs.findIndex(({ id }) => tabId === id), toIndex)
+    updateTabIndexes()
   })
 })
 
@@ -154,6 +160,7 @@ browser.tabs.onAttached.addListener(
     const newTab = await browser.tabs.get(tabId)
     runInAction(() => {
       tabs.splice(newPosition, 0, makeTab(newTab))
+      updateTabIndexes()
     })
   },
 )

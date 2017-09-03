@@ -209,10 +209,11 @@ class Tab extends React.Component {
   componentDidMount() {
     if (this.base) tabElements.set(this.base, this.props.tab)
     this._unsubscribe = autorunAsync(() => {
+      this.props.tab.index; // Run this when the tab moves too.
       if (this.base && this.props.tab.active) {
         scrollIntoViewIfNeeded(this.base)
       }
-    }, 100)
+    }, 200)
   }
 
   componentWillUnmount() {
