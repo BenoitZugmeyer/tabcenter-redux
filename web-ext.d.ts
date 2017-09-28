@@ -87,6 +87,11 @@ declare namespace WebExt {
     windowId?: number
   }
 
+  interface ExecuteScriptDetails {
+    code?: string
+    // TODO other stuff
+  }
+
   interface Tabs {
     get(tabId: number): Promise<Tab>
     query(queryInfo: TabQueryInfo): Promise<Tab[]>
@@ -95,6 +100,7 @@ declare namespace WebExt {
     create(createProperties: PartialTab): Promise<Tab>
     // move(tabIds: number[], moveProperties: MoveProperties): Promise<Tab[]>
     move(tabIds: number, moveProperties: MoveProperties): Promise<Tab>
+    executeScript(tabId: number, details: ExecuteScriptDetails): Promise<any[]>
 
     onCreated: Emitter<Tab>
     onActivated: Emitter<TabInfo>

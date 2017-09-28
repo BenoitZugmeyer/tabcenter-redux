@@ -146,13 +146,18 @@ class Tab extends React.Component {
 
   state = {
     over: false,
+    forceGenericFavicon: null,
   }
 
   render() {
     const { tab } = this.props
-    const { over } = this.state
+    const { over, forceGenericFavicon } = this.state
     if (tab.hidden) return null
 
+    const favIconUrl =
+      !tab.favIconUrl || tab.favIconUrl === forceGenericFavicon
+        ? globe
+        : tab.favIconUrl
     return (
       <div
         ref={el => {
@@ -174,34 +179,33 @@ class Tab extends React.Component {
       >
         <img
           className={style("favicon", tab.pinned && "pinnedFavicon")}
-          src={
-            tab.status === "loading"
-              ? loadingSpinnerImg
-              : tab.favIconUrl || globe
-          }
+          src={tab.status === "loading" ? loadingSpinnerImg : favIconUrl}
           width="16"
           height="16"
+          onError={() => {
+            console.warn(`Failed to load favicon: ${favIconUrl}`, this.props.tab.favIconUrl)
+            this.setState({ forceGenericFavicon: favIconUrl })
+          }}
         />
-        {tab.titleChanged &&
+        {tab.titleChanged && (
           <div
             className={style(
               "titleChanged",
               tab.pinned && "titleChangedPinned",
             )}
-          />}
-        {!tab.pinned &&
-          <div className={style("title")}>
-            {tab.title || ""}
-          </div>}
+          />
+        )}
+        {!tab.pinned && <div className={style("title")}>{tab.title || ""}</div>}
         {!tab.pinned && <div className={style("titleShadow")} />}
-        {!tab.pinned &&
+        {!tab.pinned && (
           <div className={style("actions", over && "actionsVisible")}>
             <div
               className={style("closeButton")}
               onClick={() => remove(tab)}
               title="Close"
             />
-          </div>}
+          </div>
+        )}
       </div>
     )
   }
@@ -209,7 +213,7 @@ class Tab extends React.Component {
   componentDidMount() {
     if (this.base) tabElements.set(this.base, this.props.tab)
     this._unsubscribe = autorunAsync(() => {
-      this.props.tab.index; // Run this when the tab moves too.
+      this.props.tab.index // Run this when the tab moves too.
       if (this.base && this.props.tab.active) {
         scrollIntoViewIfNeeded(this.base)
       }

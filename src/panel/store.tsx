@@ -27,7 +27,6 @@ export const search = observable({
   query: "",
 })
 
-
 /** Search */
 
 function escapeRegExp(str: string) {
@@ -59,6 +58,57 @@ reaction(
 
 /** Tabs sync */
 
+const resolvedIcons = new WeakMap()
+
+async function resolveFavicon(tab: WebExt.Tab) {
+  if (!tab.id) return
+
+  const favIconUrl = tab.favIconUrl
+  if (!favIconUrl || !favIconUrl.startsWith("blob:")) return
+
+  // This is a special hack for WhatsApp but it could be usefull for other website too.  This code
+  // is quite ugly, should be cleaned sometime.
+
+  tab.favIconUrl = undefined
+
+  let map = resolvedIcons.get(tab)
+  if (!map) {
+    map = new Map()
+    resolvedIcons.set(tab, map)
+  }
+
+  if (!map.has(favIconUrl)) {
+    const promise = browser.tabs
+      .executeScript(tab.id, {
+        code: `
+      fetch(${JSON.stringify(favIconUrl)})
+        .then(res => res.blob())
+        .then(res => {
+          return new Promise((resolve, reject) => {
+            var reader = new window.FileReader()
+            reader.onload = () => {
+              resolve(reader.result)
+            }
+            reader.onerror = reject
+            reader.readAsDataURL(res)
+          })
+        })
+      `,
+      })
+      .then(results => results[0])
+    map.set(favIconUrl, promise)
+  }
+
+  const resolved = await map.get(favIconUrl)
+
+  const observableTab = tabs.find(({ id }) => id === tab.id)
+  runInAction(() => {
+    if (observableTab && !observableTab.favIconUrl) {
+      observableTab.favIconUrl = resolved
+    }
+  })
+}
+
 function refreshTab(newTab: WebExt.Tab) {
   if (!newTab.id) {
     console.warn(currentWindowId, "Tab doesn't have an id")
@@ -80,17 +130,27 @@ function refreshTab(newTab: WebExt.Tab) {
     existingTab.titleChanged = true
   }
 
+  resolveFavicon(newTab)
+
   extendObservable(existingTab, newTab)
 }
 
 function updateTabIndexes() {
-  tabs.forEach((tab, index) => tab.index = index)
+  tabs.forEach((tab, index) => (tab.index = index))
 }
 
 export let currentWindowId: number = -1
 
 function makeTab(tab: WebExt.Tab) {
-  return { ...tab, titleChanged: false, hidden: false, dragging: false, dragTarget: false }
+  resolveFavicon(tab)
+
+  return {
+    ...tab,
+    titleChanged: false,
+    hidden: false,
+    dragging: false,
+    dragTarget: false,
+  }
 }
 
 browser.windows
